@@ -85,7 +85,7 @@ class HSMS:
                         'Time': time_of_last_state_change[sensor_name]
                     }
                     # Post data to firebase database table
-                    db_save_result = firebase.post('/homesecuritymonitoringsystem/table_SensorStateData', sensor_data)
+                    db_save_result = firebase.post('/table_SensorStateData', sensor_data)
                     self.logger.info(db_save_result)
 
                     # Reset time_in_state
