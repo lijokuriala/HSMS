@@ -54,7 +54,7 @@ class HSMS:
             self.logger.info("Configuring pin %d for \"%s\"", 15, "MainGarage")
             GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
             self.logger.info("Status of door is \"%s\"", get_garage_door_state(15))
-            logging.info(("Status of door is \"%s\"", get_garage_door_state(15)))
+            logging.info(("Status of the door is \"%s\"", get_garage_door_state(15)))
 
             # Last state of each garage door
             door_states = dict()
@@ -75,7 +75,7 @@ class HSMS:
                 if door_states[name] != state:
                     door_states[name] = state
                     time_of_last_state_change[name] = time.time()
-                    self.logger.info("State changed to \"%s\"", state)
+                    self.logger.info("State changed to " + state)
 
                     # Reset time_in_state
                     time_in_state = 0
