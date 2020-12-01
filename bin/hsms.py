@@ -74,7 +74,7 @@ class HSMS:
                 if door_states[sensor_name] != state:
                     state = door_states[sensor_name]
                     time_in_state = time.time() - time_of_last_state_change[sensor_name]
-                    timestring = time.strftime('%Y-%m-%d %I:%M:%S %p %Z')
+                    timestring = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
                     self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state,
                                      time_in_state, timestring)
 
