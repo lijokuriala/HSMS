@@ -56,21 +56,30 @@ class HSMS:
             self.logger.info("Status of door is \"%s\"", get_garage_door_state(15))
             logging.info(("Status of door is \"%s\"", get_garage_door_state(15)))
 
-            state = get_garage_door_state(15)
+            # Last state of each garage door
+            door_states = dict()
+
+            # time.time() of the last time the garage door changed state
+            time_of_last_state_change = dict()
+
+            name = "MainGarage"
+
+            # Get init values
+            door_states[name] = get_garage_door_state(15)
+            time_of_last_state_change[name] = time.time()
+
             while True:
-                # Last state of each garage door
-                door_states = dict()
+                state = get_garage_door_state(15)
+                door_states[name] = get_garage_door_state(15)
 
-                # time.time() of the last time the garage door changed state
-                time_of_last_state_change = dict()
+                if door_states[name] != state:
+                    door_states[name] = state
+                    time_of_last_state_change[name] = time.time()
+                    self.logger.info("State changed to \"%s\"", state)
 
-                door_states["MainGarage"] = get_garage_door_state(15)
-                time_of_last_state_change["MainGarage"] = time.time()
-
-                if door_states["MainGarage"] != state:
-                    door_states["MainGarage"] = state
-                    time_of_last_state_change["MainGarage"] = time.time()
-                    self.logger.info("State changed to %s",state)
+                    # Reset time_in_state
+                    time_in_state = 0
+                time.sleep(1)
 
         except KeyboardInterrupt:
             logging.critical("Terminating due to keyboard interrupt")
