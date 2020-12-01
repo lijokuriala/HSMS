@@ -32,6 +32,7 @@ class main_hsms:
             #           for gdoor in gdoorcfg.GARAGE_DOORS:
             #                self.logger.info("Configuring pin %d for \"%s\"", gdoor['pin'], gdoor['name'])
             self.logger.info("Status of door is \"%s\"", get_garage_door_state(15))
+            logging.info(("Status of door is \"%s\"", get_garage_door_state(15)))
 
         except KeyboardInterrupt:
             logging.critical("Terminating due to keyboard interrupt")
