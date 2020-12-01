@@ -9,8 +9,7 @@ import traceback
 
 import RPi.GPIO as GPIO
 
-
-# import gdoor_config as gdoorcfg
+from firebase import firebase
 
 
 # Get Sensor data
@@ -32,17 +31,14 @@ class HSMS:
     def main(self):
 
         try:
-
             # Set up logging
             log_fmt = '%(asctime)-15s %(levelname)-8s %(message)s'
             log_level = logging.INFO
+            # Log to a real terminal stdout
+            logging.basicConfig(format=log_fmt, level=log_level)
 
-            if sys.stdout.isatty():
-                # Connected to a real terminal - log to stdout
-                logging.basicConfig(format=log_fmt, level=log_level)
-            else:
-                # Background mode - log to file
-                logging.basicConfig(format=log_fmt, level=log_level, filename="testlog")
+            # Firebase connection
+            firebase = firebase.FirebaseApplication("https://homesecuritymonitoringsystem.firebaseio.com/", None)
 
             # Banner
             self.logger.info("==========================================================")
@@ -51,10 +47,16 @@ class HSMS:
             # Use Raspberry Pi board pin numbers
             self.logger.info("Configuring global settings")
             GPIO.setmode(GPIO.BOARD)
-            # Configure sensor pis
-            self.logger.info("Configuring pin %d for \"%s\"", 15, "MainGarage")
-            GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            self.logger.info("Status of door is \"%s\"", get_garage_door_state(15))
+
+            # For time being using only one sensor
+            # Update and change this to a dynamic list later
+            sensor_name = "MainGarage"
+            sensor_pin = 15
+
+            # Configure sensor pins
+            self.logger.info("Configuring pin %d for \"%s\"", 15, sensor_name)
+            GPIO.setup(sensor_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            self.logger.info("Status of door is \"%s\"", get_garage_door_state(sensor_pin))
 
             # Last state of each garage door
             door_states = dict()
@@ -62,24 +64,34 @@ class HSMS:
             # time.time() of the last time the garage door changed state
             time_of_last_state_change = dict()
 
-            name = "MainGarage"
-
             # Get init values
-#            door_states[name] = get_garage_door_state(15)
-            state = get_garage_door_state(15)
-            time_of_last_state_change[name] = time.time()
+            state = get_garage_door_state(sensor_pin)
+            time_of_last_state_change[sensor_name] = time.time()
 
             while True:
-                door_states[name] = get_garage_door_state(15)
+                door_states[sensor_name] = get_garage_door_state(sensor_pin)
 
-                if door_states[name] != state:
-                    state = door_states[name]
-                    time_in_state = time.time() - time_of_last_state_change[name]
-                    self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", name, state, time_in_state, strftime('%Y-%m-%d %I:%M:%S %p %Z'))
+                if door_states[sensor_name] != state:
+                    state = door_states[sensor_name]
+                    time_in_state = time.time() - time_of_last_state_change[sensor_name]
+                    self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state,
+                                     time_in_state, strftime('%Y-%m-%d %I:%M:%S %p %Z'))
+
+                    # ##Write data to firebase database###
+                    # Format sensor data to save in key:value pairs
+                    sensor_data = {
+                        'Sensor': sensor_name,
+                        'State': state,
+                        'Time': time_of_last_state_change[sensor_name]
+                    }
+                    # Post data to firebase database table
+                    db_save_result = firebase.post('/homesecuritymonitoringsystem/table_SensorStateData', sensor_data)
+                    self.logger.info(db_save_result)
 
                     # Reset time_in_state
                     time_in_state = 0
-                    time_of_last_state_change[name] = time.time()
+                    time_of_last_state_change[sensor_name] = time.time()
+                # Wait for a second before checking change in status
                 time.sleep(1)
 
         except KeyboardInterrupt:
