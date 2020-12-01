@@ -11,6 +11,9 @@ import RPi.GPIO as GPIO
 
 from firebase import firebase
 
+# Firebase connection
+firebase = firebase.FirebaseApplication("https://homesecuritymonitoringsystem.firebaseio.com/", None)
+
 
 # Get Sensor data
 def get_garage_door_state(pin):
@@ -36,9 +39,6 @@ class HSMS:
             log_level = logging.INFO
             # Log to a real terminal stdout
             logging.basicConfig(format=log_fmt, level=log_level)
-
-            # Firebase connection
-            firebase = firebase.FirebaseApplication("https://homesecuritymonitoringsystem.firebaseio.com/", None)
 
             # Banner
             self.logger.info("==========================================================")
