@@ -72,7 +72,7 @@ class HSMS:
                 door_states[name] = get_garage_door_state(15)
 
                 if door_states[name] != state:
-                    door_states[name] = state
+                    state = door_states[name]
                     time_of_last_state_change[name] = time.time()
                     self.logger.info("State changed to " + state)
 
