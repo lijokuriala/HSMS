@@ -91,9 +91,10 @@ class HSMS:
                     db_save_result = firebase.post('/table_SensorStateData', sensor_data)
                     self.logger.info(db_save_result)
 
-                    # Reset time_in_state
+                    # Reset time_in_state, countdown timer etc
                     time_in_state = 0
                     time_of_last_state_change[sensor_name] = time.time()
+                    status_countdown = 15
 
                 status_countdown -= 1
                 if status_countdown <= 0:
