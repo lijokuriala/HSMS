@@ -68,6 +68,8 @@ class HSMS:
             state = get_garage_door_state(sensor_pin)
             time_of_last_state_change[sensor_name] = time.time()
 
+            status_countdown = 5
+
             while True:
                 door_states[sensor_name] = get_garage_door_state(sensor_pin)
 
@@ -92,6 +94,12 @@ class HSMS:
                     # Reset time_in_state
                     time_in_state = 0
                     time_of_last_state_change[sensor_name] = time.time()
+
+                status_countdown -= 1
+                if status_countdown <= 0:
+                    self.logger.info("No change in status for 30 minutes")
+                    status_countdown = 10   # 1800=30mins
+
                 # Wait for a second before checking change in status
                 time.sleep(1)
 
