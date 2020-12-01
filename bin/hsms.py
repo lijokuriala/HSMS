@@ -74,15 +74,16 @@ class HSMS:
                 if door_states[sensor_name] != state:
                     state = door_states[sensor_name]
                     time_in_state = time.time() - time_of_last_state_change[sensor_name]
+                    timestring = time.strftime('%Y-%m-%d %I:%M:%S %p %Z')
                     self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state,
-                                     time_in_state, strftime('%Y-%m-%d %I:%M:%S %p %Z'))
+                                     time_in_state, timestring)
 
                     # ##Write data to firebase database###
                     # Format sensor data to save in key:value pairs
                     sensor_data = {
                         'Sensor': sensor_name,
                         'State': state,
-                        'Time': time_of_last_state_change[sensor_name]
+                        'Time': timestring
                     }
                     # Post data to firebase database table
                     db_save_result = firebase.post('/table_SensorStateData', sensor_data)
