@@ -97,8 +97,8 @@ class HSMS:
 
                 status_countdown -= 1
                 if status_countdown <= 0:
-                    self.logger.info("No change in status for 30 minutes")
-                    status_countdown = 10   # 1800=30mins
+                    self.logger.info("No change in status for 15 seconds now #30 minutes now")
+                    status_countdown = 15   # 1800=30mins
 
                 # Wait for a second before checking change in status
                 time.sleep(1)
