@@ -31,6 +31,25 @@ class HSMS:
     def main(self):
 
         try:
+
+            # Set up logging
+            log_fmt = '%(asctime)-15s %(levelname)-8s %(message)s'
+            log_level = logging.INFO
+
+            if sys.stdout.isatty():
+                # Connected to a real terminal - log to stdout
+                logging.basicConfig(format=log_fmt, level=log_level)
+            else:
+                # Background mode - log to file
+                logging.basicConfig(format=log_fmt, level=log_level, filename="testlog")
+
+            # Banner
+            self.logger.info("==========================================================")
+            self.logger.info("HSMS starting")
+
+            # Use Raspberry Pi board pin numbers
+            self.logger.info("Configuring global settings")
+            GPIO.setmode(GPIO.BOARD)
             # Configure sensor pis
             #           for gdoor in gdoorcfg.GARAGE_DOORS:
             #                self.logger.info("Configuring pin %d for \"%s\"", gdoor['pin'], gdoor['name'])
