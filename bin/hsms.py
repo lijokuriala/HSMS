@@ -51,8 +51,8 @@ class HSMS:
             self.logger.info("Configuring global settings")
             GPIO.setmode(GPIO.BOARD)
             # Configure sensor pis
-            #           for gdoor in gdoorcfg.GARAGE_DOORS:
-            #                self.logger.info("Configuring pin %d for \"%s\"", gdoor['pin'], gdoor['name'])
+            self.logger.info("Configuring pin %d for \"%s\"", 15, "MainGarage")
+            GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
             self.logger.info("Status of door is \"%s\"", get_garage_door_state(15))
             logging.info(("Status of door is \"%s\"", get_garage_door_state(15)))
 
