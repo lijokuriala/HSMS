@@ -91,8 +91,8 @@ class HSMS:
                     }
                     # Post data to firebase database table
                     db_save_result = firebase.post('/table_SensorStateData', sensor_data)
-                    debug_info = db_save_result + "===" + sensor_data
-                    self.logger.info(debug_info)
+                    self.logger.info(db_save_result)
+                    self.logger.info(state)
 
                     # Reset time_in_state, countdown timer etc
                     time_in_state = 0
