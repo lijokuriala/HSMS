@@ -25,6 +25,18 @@ def get_garage_door_state(pin):
     return state
 
 
+def log_sensor_data(sensor_name, state, time_string):
+    # ##Write data to firebase database###
+    # Format sensor data to save in key:value pairs
+    sensor_data = {
+        'Sensor': sensor_name,
+        'State': state,
+        'Time': time_string
+    }
+    # Post data to firebase database table
+    db_save_result = firebase.post('/table_SensorStateData', sensor_data)
+    return db_save_result
+
 class HSMS:
     """ Main functions of HSMS"""
 
@@ -76,21 +88,12 @@ class HSMS:
                 if door_states[sensor_name] != state:
                     state = door_states[sensor_name]
                     time_in_state = time.time() - time_of_last_state_change[sensor_name]
-                    timestring = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
+                    time_string = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
                     self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state,
-                                     time_in_state, timestring)
+                                     time_in_state, time_string)
 
-                    if time_in_state >= 18:  # 1800:
-                        state = 'Alert'
                     # ##Write data to firebase database###
-                    # Format sensor data to save in key:value pairs
-                    sensor_data = {
-                        'Sensor': sensor_name,
-                        'State': state,
-                        'Time': timestring
-                    }
-                    # Post data to firebase database table
-                    db_save_result = firebase.post('/table_SensorStateData', sensor_data)
+                    db_save_result = log_sensor_data(sensor_name, state, time_string)
                     self.logger.info(db_save_result)
                     self.logger.info(state)
 
@@ -103,6 +106,14 @@ class HSMS:
                 if status_countdown <= 0:
                     self.logger.info("No change in status for 15 seconds now #30 minutes now")
                     status_countdown = 15   # 1800=30mins
+
+                # Log Alert if open for more than 30 minutes
+                if time_in_state >= 18 and state == "Open":  # 1800:
+                    state = 'Alert'
+                    # ##Write data to firebase database###
+                    db_save_result = log_sensor_data(sensor_name, state, time_string)
+                    self.logger.info(db_save_result)
+                    self.logger.info(state)
 
                 # Wait for a second before checking change in status
                 time.sleep(1)
