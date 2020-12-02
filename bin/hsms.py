@@ -81,7 +81,7 @@ class HSMS:
             time_of_last_state_change[sensor_name] = time.time()
 
             status_countdown = 5
-            time_in_state = 0
+            alert_count_up = 0
 
             while True:
                 door_states[sensor_name] = get_garage_door_state(sensor_pin)
@@ -109,7 +109,8 @@ class HSMS:
                     status_countdown = 15   # 1800=30mins
 
                 # Log Alert if open for more than 30 minutes
-                if time_in_state >= 18 and state == "Open":  # 1800:
+                alert_count_up += 1
+                if alert_count_up >= 18 and state == "Open":  # 1800:
                     state = 'Alert'
                     # ##Write data to firebase database###
                     db_save_result = log_sensor_data(sensor_name, state, time_string)
