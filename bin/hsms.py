@@ -119,11 +119,11 @@ class HSMS:
                 #     db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
                 #     self.logger.info(db_save_result)
                 #     self.logger.info("Alert")
-                ##time_in_state = time.time() - time_of_last_state_change[sensor_name]
-                if time_in_state >= 15:
-                    if time_in_state % 15 == 0:
+                time_no_change = time.time() - time_of_last_state_change[sensor_name]
+                if time_no_change >= 15:
+                    if time_no_change % 15 == 0:
                         self.logger.info("No change in status for 15 seconds now #30 minutes now")
-                    if time_in_state % 18 == 0:
+                    if time_no_change % 18 == 0:
                         db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
                         self.logger.info(db_save_result)
                         self.logger.info("Alert")
