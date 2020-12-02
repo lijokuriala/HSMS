@@ -101,24 +101,32 @@ class HSMS:
                     # Reset time_in_state, countdown timer etc
                     time_in_state = 0
                     time_of_last_state_change[sensor_name] = time.time()
-                    status_countdown = 15
-
-                    #if state == "Closed":
-                    alert_count_up = 0
-
-                status_countdown -= 1
-                if status_countdown <= 0:
-                    self.logger.info("No change in status for 15 seconds now #30 minutes now")
-                    status_countdown = 15   # 1800=30mins
-
-                # Log Alert if open for more than 30 minutes
-                alert_count_up += 1
-                if alert_count_up >= 18 and state == "Open":
-                    alert_count_up = 0
-                    # ##Write data to firebase database###
-                    db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
-                    self.logger.info(db_save_result)
-                    self.logger.info("Alert")
+                #     status_countdown = 15
+                #
+                #     #if state == "Closed":
+                #     alert_count_up = 0
+                #
+                # status_countdown -= 1
+                # if status_countdown <= 0:
+                #     self.logger.info("No change in status for 15 seconds now #30 minutes now")
+                #     status_countdown = 15   # 1800=30mins
+                #
+                # # Log Alert if open for more than 30 minutes
+                # alert_count_up += 1
+                # if alert_count_up >= 18 and state == "Open":
+                #     alert_count_up = 0
+                #     # ##Write data to firebase database###
+                #     db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
+                #     self.logger.info(db_save_result)
+                #     self.logger.info("Alert")
+                time_in_state = time.time() - time_of_last_state_change[sensor_name]
+                if time_in_state >= 15:
+                    if time_in_state % 15 == 0:
+                        self.logger.info("No change in status for 15 seconds now #30 minutes now")
+                    if time_in_state % 18 == 0:
+                        db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
+                        self.logger.info(db_save_result)
+                        self.logger.info("Alert")
 
                 # Wait for a second before checking change in status
                 time.sleep(1)
