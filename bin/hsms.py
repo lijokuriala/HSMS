@@ -62,7 +62,7 @@ class HSMS:
 
             # For time being using only one sensor
             # Update and change this to a dynamic list later
-            sensor_name = "MainGarage"
+            sensor_name = "Main Garage"
             sensor_pin = 15
 
             # Configure sensor pins
@@ -119,7 +119,7 @@ class HSMS:
                 #     db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
                 #     self.logger.info(db_save_result)
                 #     self.logger.info("Alert")
-                time_in_state = time.time() - time_of_last_state_change[sensor_name]
+                ##time_in_state = time.time() - time_of_last_state_change[sensor_name]
                 if time_in_state >= 15:
                     if time_in_state % 15 == 0:
                         self.logger.info("No change in status for 15 seconds now #30 minutes now")
