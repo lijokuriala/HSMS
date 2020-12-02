@@ -103,8 +103,8 @@ class HSMS:
                     time_of_last_state_change[sensor_name] = time.time()
                     status_countdown = 15
 
-                    if state == "Closed":
-                        alert_count_up = 0
+                    #if state == "Closed":
+                    alert_count_up = 0
 
                 status_countdown -= 1
                 if status_countdown <= 0:
