@@ -81,6 +81,7 @@ class HSMS:
             time_of_last_state_change[sensor_name] = time.time()
 
             status_countdown = 5
+            time_in_state = 0
 
             while True:
                 door_states[sensor_name] = get_garage_door_state(sensor_pin)
