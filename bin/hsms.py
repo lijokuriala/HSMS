@@ -115,10 +115,9 @@ class HSMS:
                 # Log Alert if open for more than 30 minutes
                 alert_count_up += 1
                 if alert_count_up >= 18 and state == "Open" and not alert_flag:  # 1800:
-                    state = 'Alert'
                     alert_flag = True
                     # ##Write data to firebase database###
-                    db_save_result = log_sensor_data(sensor_name, state, time_string)
+                    db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
                     self.logger.info(db_save_result)
                     self.logger.info(state)
 
