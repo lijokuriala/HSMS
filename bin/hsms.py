@@ -82,7 +82,7 @@ class HSMS:
 
             status_countdown = 5
             alert_count_up = 0
-            alert_flag = False
+            #alert_flag = False
 
             while True:
                 door_states[sensor_name] = get_garage_door_state(sensor_pin)
@@ -96,16 +96,17 @@ class HSMS:
 
                     # ##Write data to firebase database###
                     db_save_result = log_sensor_data(sensor_name, state, time_string)
-                    self.logger.info(db_save_result)
-                    self.logger.info(state)
+                    self.logger.debug(db_save_result)
+                    self.logger.debug(state)
 
                     # Reset time_in_state, countdown timer etc
                     time_in_state = 0
                     time_of_last_state_change[sensor_name] = time.time()
                     status_countdown = 15
 
-                    if state == "Closed" and alert_flag:
-                        alert_flag = False
+                    if state == "Closed":  # and alert_flag:
+                        #alert_flag = False
+                        alert_count_up = 0
 
                 status_countdown -= 1
                 if status_countdown <= 0:
@@ -114,12 +115,13 @@ class HSMS:
 
                 # Log Alert if open for more than 30 minutes
                 alert_count_up += 1
-                if alert_count_up >= 18 and state == "Open" and not alert_flag:  # 1800:
-                    alert_flag = True
+                if alert_count_up >= 18 and state == "Open":  # and not alert_flag:  # 1800:
+                    # alert_flag = True
+                    alert_count_up = 0
                     # ##Write data to firebase database###
                     db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
-                    self.logger.info(db_save_result)
-                    self.logger.info(state)
+                    self.logger.debug(db_save_result)
+                    self.logger.debug("Alert")
 
                 # Wait for a second before checking change in status
                 time.sleep(1)
