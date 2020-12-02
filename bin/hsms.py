@@ -125,7 +125,7 @@ class HSMS:
                 self.logger.info("Time no change  %0.f sec", time_no_change)
                 if time_no_change >= 15:
                     if time_no_change % 15 >= 0 and time_no_change / 15 > 1:
-                        self.logger.info("time_no_change % 15  %0.f sec", time_no_change % 15)
+                        self.logger.info("time_no_change mod 15  %0.f sec", time_no_change % 15)
                         self.logger.info("No change in status for 15 seconds now #30 minutes now")
                     if time_no_change % 18 == 0:
                         db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
