@@ -101,6 +101,7 @@ class HSMS:
                     # Reset time_in_state, countdown timer etc
                     time_in_state = 0
                     time_of_last_state_change[sensor_name] = time.time()
+                    self.logger.info(time_of_last_state_change[sensor_name])
                 #     status_countdown = 15
                 #
                 #     #if state == "Closed":
@@ -119,6 +120,7 @@ class HSMS:
                 #     db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
                 #     self.logger.info(db_save_result)
                 #     self.logger.info("Alert")
+                self.logger.info(time_of_last_state_change[sensor_name])
                 time_no_change = time.time() - time_of_last_state_change[sensor_name]
                 if time_no_change >= 15:
                     if time_no_change % 15 == 0:
