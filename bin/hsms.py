@@ -80,7 +80,7 @@ class HSMS:
                     self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state,
                                      time_in_state, timestring)
 
-                    if time_in_state >= 1800:
+                    if time_in_state >= 18:  # 1800:
                         state = 'Alert'
                     # ##Write data to firebase database###
                     # Format sensor data to save in key:value pairs
