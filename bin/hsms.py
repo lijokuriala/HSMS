@@ -90,17 +90,17 @@ class HSMS:
                     state = door_states[sensor_name]
                     time_in_state = time.time() - time_of_last_state_change[sensor_name]
                     time_string = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
-                    self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state,
-                                     time_in_state, time_string)
+                    self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state, time_in_state, time_string)
 
                     # ##Write data to firebase database###
                     db_save_result = log_sensor_data(sensor_name, state, time_string)
                     self.logger.info(db_save_result)
                     self.logger.info(state)
 
-                    # Reset time_in_state, countdown timer etc
+                    # Reset time_in_state
                     time_in_state = 0
                     time_of_last_state_change[sensor_name] = time.time()
+
                 #     status_countdown = 15
                 #
                 #     #if state == "Closed":
@@ -119,19 +119,24 @@ class HSMS:
                 #     db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
                 #     self.logger.info(db_save_result)
                 #     self.logger.info("Alert")
+
+                # Calculate time since last change
                 time_no_change = time.time() - time_of_last_state_change[sensor_name]
                 self.logger.info("Time no change  %0.f sec", time_no_change)
-                if int(time_no_change) >= 15:
-                    if int(time_no_change) % 15 == 0:  #and time_no_change / 15 > 1:
-                        self.logger.info("time_no_change mod 15  %0.f sec", time_no_change % 15)
-                        self.logger.info("No change in status for 15 seconds now #30 minutes now")
-                    if int(time_no_change) % 18 == 0:
-                        db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
-                        self.logger.info(db_save_result)
-                        self.logger.info("Alert")
 
-                # Wait for a second before checking change in status
-                time.sleep(1)
+                # Log a message on console when no change in state of sensor
+                if int(time_no_change) >= 15:
+                    if int(time_no_change) % 15 == 0:
+                        self.logger.info("No change in status for 15 seconds now #30 minutes now")
+
+                        # If sensor is open for 30 minutes, log an alert into Firebase DB.
+                        if state == "Open":
+                            db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
+                            self.logger.info(db_save_result)
+                            self.logger.info("Alert")
+
+                # Wait for a minute before checking change in status
+                time.sleep(1)  # 60, temporarily using 1 sec for Demo
 
         except KeyboardInterrupt:
             logging.critical("Terminating due to keyboard interrupt")
