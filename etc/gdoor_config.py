@@ -6,7 +6,7 @@ SENSORS = [
     },
 
      {
-         'pin': 16,
+         'pin': 11,
          'name': "Test Garage Door"
      }
 ]
