@@ -64,8 +64,8 @@ class HSMS:
 
             # For time being using only one sensor
             # Update and change this to a dynamic list later
-            sensor_name = "Main Garage"
-            sensor_pin = 15
+            # sensor_name = "Main Garage"
+            # sensor_pin = 15
 
             # Configure sensor pins
             for sensor in cfg.SENSORS:
@@ -82,9 +82,14 @@ class HSMS:
 
             # Get init values
             for sensor in cfg.SENSORS:
-                sensor_states[sensor['name']] = get_sensor_state(sensor['pin'])
-                time_of_last_state_change[sensor['name']] = time.time()
+                sensor_name = sensor['name']
+                state = get_sensor_state(sensor['pin'])
+                time_of_last_state_change[sensor_name] = time.time()
                 time_no_change[sensor['name']] = 0
+                # Write init values into DB
+                db_save_result = log_sensor_data(sensor_name, state, time_of_last_state_change[sensor_name])
+                self.logger.info(db_save_result)
+                self.logger.info(state)
 
             while True:
                 for sensor in cfg.SENSORS:
@@ -109,17 +114,17 @@ class HSMS:
                         time_in_state = 0
 
                     # Calculate time since last change
-                    time_no_change = time.time() - time_of_last_state_change[sensor_name]
+                    time_no_change[sensor_name] = time.time() - time_of_last_state_change[sensor_name]
                     # self.logger.info("Time no change  %0.f sec", time_no_change)
 
                     # Log a message on console when no change in state of sensor
-                    if int(time_no_change) >= 15:
-                        if int(time_no_change) % 15 == 0:
-                            self.logger.info("No change in status for 15 seconds now #30 minutes now")
+                    if int(time_no_change[sensor_name]) >= 15:
+                        if int(time_no_change[sensor_name]) % 15 == 0:
+                            self.logger.info("No change in status of %s for 15 seconds now #30 minutes now", sensor_name)
 
                             # If sensor is open for 30 minutes, log an alert into Firebase DB.
                             if state == "Open":
-                                db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
+                                db_save_result = log_sensor_data(sensor_name, "Alert", time_of_last_state_change[sensor_name])
                                 self.logger.info(db_save_result)
                                 self.logger.info("Alert")
 
