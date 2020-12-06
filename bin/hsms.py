@@ -86,8 +86,9 @@ class HSMS:
                 sensor_states[sensor_name] = get_sensor_state(sensor['pin'])
                 time_of_last_state_change[sensor_name] = time.time()
                 time_no_change[sensor['name']] = 0
+                time_string = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
                 # Write init values into DB
-                db_save_result = log_sensor_data(sensor_name, sensor_states[sensor_name], time_of_last_state_change[sensor_name])
+                db_save_result = log_sensor_data(sensor_name, sensor_states[sensor_name], time_string)
                 self.logger.info(db_save_result)
                 self.logger.info(sensor_states[sensor_name])
 
