@@ -78,20 +78,18 @@ class HSMS:
 
             # time.time() of the last time the garage door changed state
             time_of_last_state_change = dict()
+            time_no_change = dict()
 
             # Get init values
             for sensor in cfg.SENSORS:
-                sensor_name = sensor['name']
-                sensor_pin = sensor['pin']
-                state = get_sensor_state(sensor_pin)
-                sensor_states[sensor_name] = state
-                time_of_last_state_change[sensor_name] = time.time()
+                sensor_states[sensor['name']] = get_sensor_state(sensor['pin'])
+                time_of_last_state_change[sensor['name']] = time.time()
+                time_no_change[sensor['name']] = 0
 
             while True:
                 for sensor in cfg.SENSORS:
                     sensor_name = sensor['name']
-                    sensor_pin = sensor['pin']
-                    state = get_sensor_state(sensor_pin)
+                    state = get_sensor_state(sensor['pin'])
                     time_in_state = time.time() - time_of_last_state_change[sensor_name]
                     time_string = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
 
