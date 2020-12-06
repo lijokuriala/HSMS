@@ -81,21 +81,25 @@ class HSMS:
 
             # Get init values
             for sensor in cfg.SENSORS:
-                state = get_sensor_state(sensor['pin'])
-                time_of_last_state_change[sensor['name']] = time.time()
+                sensor_name = sensor['name']
+                sensor_pin = sensor['pin']
+                state = get_sensor_state(sensor_pin)
+                sensor_states[sensor_name] = state
+                time_of_last_state_change[sensor_name] = time.time()
 
             while True:
                 for sensor in cfg.SENSORS:
                     sensor_name = sensor['name']
                     sensor_pin = sensor['pin']
-                    sensor_states[sensor_name] = get_sensor_state(sensor_pin)
+                    state = get_sensor_state(sensor_pin)
                     time_in_state = time.time() - time_of_last_state_change[sensor_name]
+                    time_string = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
 
                     # Check if sensor state has changed
                     if sensor_states[sensor_name] != state:
-                        state = sensor_states[sensor_name]
-                        time_in_state = time.time() - time_of_last_state_change[sensor_name]
-                        time_string = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
+                        sensor_states[sensor_name] = state
+                        time_of_last_state_change[sensor_name] = time.time()
+                        #  time_in_state = time.time() - time_of_last_state_change[sensor_name]
                         self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state, time_in_state, time_string)
 
                         # ##Write data to firebase database###
@@ -105,22 +109,21 @@ class HSMS:
 
                         # Reset time_in_state
                         time_in_state = 0
-                        time_of_last_state_change[sensor_name] = time.time()
 
                     # Calculate time since last change
                     time_no_change = time.time() - time_of_last_state_change[sensor_name]
                     # self.logger.info("Time no change  %0.f sec", time_no_change)
 
-                # Log a message on console when no change in state of sensor
-                if int(time_no_change) >= 15:
-                    if int(time_no_change) % 15 == 0:
-                        self.logger.info("No change in status for 15 seconds now #30 minutes now")
+                    # Log a message on console when no change in state of sensor
+                    if int(time_no_change) >= 15:
+                        if int(time_no_change) % 15 == 0:
+                            self.logger.info("No change in status for 15 seconds now #30 minutes now")
 
-                        # If sensor is open for 30 minutes, log an alert into Firebase DB.
-                        if state == "Open":
-                            db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
-                            self.logger.info(db_save_result)
-                            self.logger.info("Alert")
+                            # If sensor is open for 30 minutes, log an alert into Firebase DB.
+                            if state == "Open":
+                                db_save_result = log_sensor_data(sensor_name, "Alert", time_string)
+                                self.logger.info(db_save_result)
+                                self.logger.info("Alert")
 
                 # Wait for a minute before checking change in status
                 time.sleep(1)  # 60, temporarily using 1 sec for Demo
