@@ -125,7 +125,7 @@ class HSMS:
 
                             # If sensor is open for 30 minutes, log an alert into Firebase DB.
                             if state == "Open":
-                                db_save_result = log_sensor_data(sensor_name, "Alert", (time_of_last_state_change[sensor_name]).strftime('%Y-%b-%d %I:%M:%S %p %Z'))
+                                db_save_result = log_sensor_data(sensor_name, "Alert", strftime(time_of_last_state_change[sensor_name], '%Y-%b-%d %I:%M:%S %p %Z'))
                                 self.logger.info(db_save_result)
                                 self.logger.info("Alert")
 
