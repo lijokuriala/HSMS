@@ -83,13 +83,13 @@ class HSMS:
             # Get init values
             for sensor in cfg.SENSORS:
                 sensor_name = sensor['name']
-                state = get_sensor_state(sensor['pin'])
+                sensor_states[sensor_name] = get_sensor_state(sensor['pin'])
                 time_of_last_state_change[sensor_name] = time.time()
                 time_no_change[sensor['name']] = 0
                 # Write init values into DB
-                db_save_result = log_sensor_data(sensor_name, state, time_of_last_state_change[sensor_name])
+                db_save_result = log_sensor_data(sensor_name, sensor_states[sensor_name], time_of_last_state_change[sensor_name])
                 self.logger.info(db_save_result)
-                self.logger.info(state)
+                self.logger.info(sensor_states[sensor_name])
 
             while True:
                 for sensor in cfg.SENSORS:
