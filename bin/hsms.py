@@ -78,6 +78,7 @@ class HSMS:
 
             # time.time() of the last time the garage door changed state
             time_of_last_state_change = dict()
+            time_of_last_state_change_strf = dict()
             time_no_change = dict()
 
             # Get init values
@@ -85,6 +86,7 @@ class HSMS:
                 sensor_name = sensor['name']
                 sensor_states[sensor_name] = get_sensor_state(sensor['pin'])
                 time_of_last_state_change[sensor_name] = time.time()
+                time_of_last_state_change_strf[sensor_name] = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
                 time_no_change[sensor['name']] = 0
                 time_string = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
                 # Write init values into DB
@@ -103,6 +105,7 @@ class HSMS:
                     if sensor_states[sensor_name] != state:
                         sensor_states[sensor_name] = state
                         time_of_last_state_change[sensor_name] = time.time()
+                        time_of_last_state_change_strf[sensor_name] = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
                         #  time_in_state = time.time() - time_of_last_state_change[sensor_name]
                         self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state, time_in_state, time_string)
 
@@ -125,7 +128,7 @@ class HSMS:
 
                             # If sensor is open for 30 minutes, log an alert into Firebase DB.
                             if state == "Open":
-                                db_save_result = log_sensor_data(sensor_name, "Alert", strftime(time_of_last_state_change[sensor_name], '%Y-%b-%d %I:%M:%S %p %Z'))
+                                db_save_result = log_sensor_data(sensor_name, "Alert", time_of_last_state_change_strf[sensor_name])
                                 self.logger.info(db_save_result)
                                 self.logger.info("Alert")
 
