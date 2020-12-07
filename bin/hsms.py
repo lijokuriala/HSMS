@@ -27,13 +27,14 @@ def get_sensor_state(pin):
     return state
 
 
-def log_sensor_data(sensor_name, state, time_string):
+def log_sensor_data(sensor_name, state, time_string, notify):
     # ##Write data to firebase database###
     # Format sensor data to save in key:value pairs
     sensor_data = {
         'Sensor': sensor_name,
         'State': state,
-        'Time': time_string
+        'Time': time_string,
+        'Alert_Notify': notify
     }
     # Post data to firebase database table
     db_save_result = firebase.post('/table_SensorStateData', sensor_data)
@@ -90,7 +91,7 @@ class HSMS:
                 time_no_change[sensor['name']] = 0
                 time_string = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
                 # Write init values into DB
-                db_save_result = log_sensor_data(sensor_name, sensor_states[sensor_name], time_string)
+                db_save_result = log_sensor_data(sensor_name, sensor_states[sensor_name], time_string, sensor['alert_notify'])
                 self.logger.info(db_save_result)
                 self.logger.info(sensor_states[sensor_name])
 
@@ -110,7 +111,7 @@ class HSMS:
                         self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state, time_in_state, time_string)
 
                         # ##Write data to firebase database###
-                        db_save_result = log_sensor_data(sensor_name, state, time_string)
+                        db_save_result = log_sensor_data(sensor_name, state, time_string, sensor['alert_notify'])
                         self.logger.info(db_save_result)
                         self.logger.info(state)
 
@@ -128,7 +129,7 @@ class HSMS:
 
                             # If sensor is open for 30 minutes, log an alert into Firebase DB.
                             if state == "Open":
-                                db_save_result = log_sensor_data(sensor_name, "Alert", time_of_last_state_change_strf[sensor_name])
+                                db_save_result = log_sensor_data(sensor_name, "Alert", time_of_last_state_change_strf[sensor_name], sensor['alert_notify'])
                                 self.logger.info(db_save_result)
                                 self.logger.info("Alert")
 
