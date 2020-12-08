@@ -125,7 +125,7 @@ class HSMS:
                     # Log a message on console when no change in state of sensor
                     if int(time_no_change[sensor_name]) >= int(sensor['alert_notification_interval_minutes']*60):
                         if int(time_no_change[sensor_name]) % int(sensor['alert_notification_interval_minutes']*60) == 0:
-                            self.logger.info("No change in status of %s for 15 seconds now #30 minutes now", sensor_name)
+                            self.logger.info("No change in status of %s for %d seconds now", sensor_name, int(sensor['alert_notification_interval_minutes']*60))
 
                             # If sensor is open for specified interval, log an alert into Firebase DB.
                             if state == "Open":
