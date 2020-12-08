@@ -4,7 +4,7 @@ SENSORS = [
         'pin': 15,
         'name': "GARAGE Door",
         'alert_notify': 'Y',
-        'alert_notification_interval_minutes': 0.41666
+        'alert_notification_interval_minutes': 0.34
     },
 
      {
