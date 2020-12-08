@@ -2,15 +2,15 @@
 SENSORS = [
     {
         'pin': 15,
-        'name': "Main Garage Door",
+        'name': "GARAGE Door",
         'alert_notify': 'Y',
-        'alert_notification_interval_minutes': 0.25
+        'alert_notification_interval_minutes': 0.5
     },
 
      {
          'pin': 40,
-         'name': "Test Garage Door",
+         'name': "Front Entry Door",
          'alert_notify': 'N',
-        'alert_notification_interval_minutes': 0.5
+        'alert_notification_interval_minutes': 0.25
      }
 ]
