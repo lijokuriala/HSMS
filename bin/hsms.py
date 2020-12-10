@@ -8,6 +8,7 @@ import logging
 import traceback
 
 import RPi.GPIO as GPIO
+
 sys.path.append('/usr/local/etc')
 import gdoor_config as cfg
 
@@ -26,7 +27,7 @@ def get_sensor_state(pin):
 
     return state
 
-
+# Post the sensor data to the Firebase database
 def log_sensor_state(sensor_name, state, time_string, notify):
     # ##Write data to firebase database###
     # Format sensor data to save in key:value pairs
@@ -39,6 +40,7 @@ def log_sensor_state(sensor_name, state, time_string, notify):
     # Post data to firebase database table
     db_save_result = firebase.post('/table_SensorStateData', sensor_data)
     return db_save_result
+
 
 class HSMS:
     """ Main functions of HSMS"""
@@ -63,12 +65,7 @@ class HSMS:
             self.logger.info("Configuring global settings")
             GPIO.setmode(GPIO.BOARD)
 
-            # For time being using only one sensor
-            # Update and change this to a dynamic list later
-            # sensor_name = "Main Garage"
-            # sensor_pin = 15
-
-            # Configure sensor pins
+           # Configure sensor pins
             for sensor in cfg.SENSORS:
                 self.logger.info("Configuring pin %d for \"%s\"", sensor['pin'], sensor['name'])
                 GPIO.setup(sensor['pin'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -91,10 +88,12 @@ class HSMS:
                 time_no_change[sensor['name']] = 0
                 time_string = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
                 # Write init values into DB
-                db_save_result = log_sensor_state(sensor_name, sensor_states[sensor_name], time_string, sensor['alert_notify'])
+                db_save_result = log_sensor_state(sensor_name, sensor_states[sensor_name], time_string,
+                                                  sensor['alert_notify'])
                 self.logger.info(db_save_result)
                 self.logger.info(sensor_states[sensor_name])
 
+            # Continually check the sensor status
             while True:
                 for sensor in cfg.SENSORS:
                     sensor_name = sensor['name']
@@ -107,8 +106,8 @@ class HSMS:
                         sensor_states[sensor_name] = state
                         time_of_last_state_change[sensor_name] = time.time()
                         time_of_last_state_change_strf[sensor_name] = time.strftime('%Y-%b-%d %I:%M:%S %p %Z')
-                        #  time_in_state = time.time() - time_of_last_state_change[sensor_name]
-                        self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state, time_in_state, time_string)
+                        self.logger.info("State of \"%s\" changed to %s after %.0f sec at %s", sensor_name, state,
+                                         time_in_state, time_string)
 
                         # ##Write data to firebase database###
                         db_save_result = log_sensor_state(sensor_name, state, time_string, sensor['alert_notify'])
@@ -123,13 +122,17 @@ class HSMS:
                     # self.logger.info("Time no change  %0.f sec", time_no_change)
 
                     # Log a message on console when no change in state of sensor
-                    if int(time_no_change[sensor_name]) >= int(sensor['alert_notification_interval_minutes']*60):
-                        if int(time_no_change[sensor_name]) % int(sensor['alert_notification_interval_minutes']*60) == 0:
-                            self.logger.info("No change in status of %s for %d seconds now", sensor_name, int(sensor['alert_notification_interval_minutes']*60))
+                    if int(time_no_change[sensor_name]) >= int(sensor['alert_notification_interval_minutes'] * 60):
+                        if int(time_no_change[sensor_name]) % int(
+                                sensor['alert_notification_interval_minutes'] * 60) == 0:
+                            self.logger.info("No change in status of %s for %d seconds now", sensor_name,
+                                             int(sensor['alert_notification_interval_minutes'] * 60))
 
                             # If sensor is open for specified interval, log an alert into Firebase DB.
                             if state == "Open":
-                                db_save_result = log_sensor_state(sensor_name, "Alert", time_of_last_state_change_strf[sensor_name], sensor['alert_notify'])
+                                db_save_result = log_sensor_state(sensor_name, "Alert",
+                                                                  time_of_last_state_change_strf[sensor_name],
+                                                                  sensor['alert_notify'])
                                 self.logger.info(db_save_result)
                                 self.logger.info("Alert")
 
